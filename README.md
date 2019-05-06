@@ -1,2 +1,2 @@
-#Classic Bot
+# Classic Bot
 Private Discord Bot
