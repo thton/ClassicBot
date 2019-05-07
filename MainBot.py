@@ -112,6 +112,18 @@ async def bcoin(ctx, bcoins=0, rate=0):
 	await classicBot.say(str(result) + " " + postfix)
 
 @classicBot.command(pass_context=True)
+@commands.has_permissions(manage_messages=True)
+async def nuke(ctx, amount=5):
+	channel = ctx.message.channel
+	messages = []
+	if (int(amount) >= 50):
+		amount = 50
+	async for message in classicBot.logs_from(channel, limit=int(amount)):
+		messages.append(message)
+	await classicBot.delete_messages(messages)
+	await classicBot.say(str(amount) + " Messages Nuked :boom:")
+
+@classicBot.command(pass_context=True)
 async def profile(ctx, user: discord.Member):
 	Level = 1
 	lowExp = 0
