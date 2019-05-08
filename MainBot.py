@@ -14,6 +14,7 @@ classicBot = commands.Bot(command_prefix='#')
 
 @classicBot.event
 async def on_ready():
+	await classicBot.change_presence(game=discord.Game(name="Growing Potatoes"))
 	print ("ClassicBot is running")
 	print ("Name: " + classicBot.user.name)
 	print ("ID: " + classicBot.user.id)
