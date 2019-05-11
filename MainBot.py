@@ -5,16 +5,25 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
 import asyncio
+from itertools import cycle
 import random
 
 with open('botKey.txt', 'r') as key:
 	botKey = key.readline()
 
 classicBot = commands.Bot(command_prefix='#')
+statuses = ["Growing Potatoes", "Code forever", "Azur Lane"]
+
+async def change_status():
+	await classicBot.wait_until_ready()
+	status = cycle(statuses)
+	while not classicBot.is_closed:
+		current_status = next(status)
+		await classicBot.change_presence(game=discord.Game(name=current_status))
+		await asyncio.sleep(60)
 
 @classicBot.event
 async def on_ready():
-	await classicBot.change_presence(game=discord.Game(name="Growing Potatoes"))
 	print ("ClassicBot is running")
 	print ("Name: " + classicBot.user.name)
 	print ("ID: " + classicBot.user.id)
@@ -143,5 +152,5 @@ async def Profile(ctx, user: discord.Member):
 
 
 
-
+classicBot.loop.create_task(change_status())
 classicBot.run(botKey)
