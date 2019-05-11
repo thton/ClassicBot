@@ -12,6 +12,7 @@ with open('botKey.txt', 'r') as key:
 	botKey = key.readline()
 
 classicBot = commands.Bot(command_prefix='#')
+classicBot.remove_command("help")
 statuses = ["Growing Potatoes", "Code forever", "Azur Lane"]
 
 async def change_status():
@@ -27,6 +28,27 @@ async def on_ready():
 	print ("ClassicBot is running")
 	print ("Name: " + classicBot.user.name)
 	print ("ID: " + classicBot.user.id)
+
+@classicBot.command(pass_context=True)
+async def help(ctx):
+	author = ctx.message.author
+
+	helpmessage = discord.Embed(
+		colour = discord.Colour.green()
+	)
+
+	helpmessage.set_author(name="Help")
+	helpmessage.add_field(name="#info", value="([@Someone]) Returns info about the mentioned user", inline=False)
+	helpmessage.add_field(name="#momo", value="Returns a Momo specific message", inline=False)
+	helpmessage.add_field(name="#tulip", value="Returns a Tulip specific message", inline=False)
+	helpmessage.add_field(name="#Gay", value="([@Someone]) Returns a message calling the mentioned user gay with an image", inline=False)
+	helpmessage.add_field(name="#spam", value="([@Someone]) Makes the bot spam the mentioned user 5 times, must have the Memes role", inline=False)
+	helpmessage.add_field(name="#dice", value="Rolls a dice between 1 and 6", inline=False)
+	helpmessage.add_field(name="#m | #d | #a | #s", value="([number] [number]) Basic multiply, divide, add, and subtract commands", inline=False)
+	helpmessage.add_field(name="#bcoin", value="([bcoins] [rate]) Burning Soulworker specific command for selling Bcoin", inline=False)
+	helpmessage.add_field(name="#nuke", value="([number of messages to delete]) Used for mass deletion of messages, caps at 50, and must have delete powers", inline=False)
+
+	await classicBot.send_message(author, embed=helpmessage)
 
 @classicBot.event
 async def on_message(message):
