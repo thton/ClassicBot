@@ -1,9 +1,11 @@
 #Classic Bot
 #Made by Toan Ton
+#Version 0.0.1
 
 import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
+import youtube_dl
 import asyncio
 from itertools import cycle
 import random
@@ -13,7 +15,9 @@ with open('botKey.txt', 'r') as key:
 
 classicBot = commands.Bot(command_prefix='#')
 classicBot.remove_command("help")
-statuses = ["Growing Potatoes", "Code forever", "Azur Lane"]
+statuses = ["Version 0.0.1", "Code forever", "Azur Lane"]
+
+players = {}
 
 async def change_status():
 	await classicBot.wait_until_ready()
@@ -50,12 +54,51 @@ async def help(ctx):
 
 	await classicBot.send_message(author, embed=helpmessage)
 
+@classicBot.command(pass_context=True)
+async def join(ctx):
+	channel = ctx.message.author.voice.voice_channel
+	await classicBot.join_voice_channel(channel)
+
+@classicBot.command(pass_context=True)
+async def leave(ctx):
+	server = ctx.message.server
+	voice_client = classicBot.voice_client_in(server)
+	await voice_client.disconnect()
+
 @classicBot.event
 async def on_message(message):
 	channel = message.channel
 	if((message.content.lower().find('fuck toan') >= 0) and (message.author.name != 'ClassicBot')):
 		await classicBot.send_message(channel, 'No, Fuck you {}'.format(message.author.mention))
 	await classicBot.process_commands(message)
+
+@classicBot.command(pass_context=True)
+async def play(ctx, url):
+	server = ctx.message.server
+	channel = ctx.message.author.voice.voice_channel
+	voice_client = classicBot.voice_client_in(server)
+	beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
+	player = await voice_client.create_ytdl_player(url, before_options=beforeArgs)
+	players[server.id] = player
+	player.start()
+
+@classicBot.command(pass_context=True)
+async def pause(ctx):
+	id = ctx.message.server.id
+	players[id].pause()
+
+@classicBot.command(pass_context=True)
+async def stop(ctx):
+	id = ctx.message.server.id
+	players[id].stop()
+	server = ctx.message.server
+	voice_client = classicBot.voice_client_in(server)
+	await voice_client.disconnect()
+
+@classicBot.command(pass_context=True)
+async def resume(ctx):
+	id = ctx.message.server.id
+	players[id].resume()
 
 @classicBot.command(pass_context=True)
 async def info(ctx, user: discord.Member):
