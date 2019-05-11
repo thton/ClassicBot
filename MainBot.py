@@ -17,8 +17,10 @@ classicBot = commands.Bot(command_prefix='#')
 classicBot.remove_command("help")
 statuses = ["Version 0.0.1", "Code forever", "Azur Lane"]
 
+#music player variables
 players = {}
-
+queues = {}
+#change status every 60 seconds
 async def change_status():
 	await classicBot.wait_until_ready()
 	status = cycle(statuses)
@@ -26,7 +28,7 @@ async def change_status():
 		current_status = next(status)
 		await classicBot.change_presence(game=discord.Game(name=current_status))
 		await asyncio.sleep(60)
-
+#prints in console when bot is running and ready
 @classicBot.event
 async def on_ready():
 	print ("ClassicBot is running")
@@ -72,15 +74,42 @@ async def on_message(message):
 		await classicBot.send_message(channel, 'No, Fuck you {}'.format(message.author.mention))
 	await classicBot.process_commands(message)
 
+def check_queue(id):
+	if queues[id] != []:
+		player = queues[id].pop(0)
+		players[id] = player
+		player.start()
+
 @classicBot.command(pass_context=True)
 async def play(ctx, url):
 	server = ctx.message.server
-	channel = ctx.message.author.voice.voice_channel
 	voice_client = classicBot.voice_client_in(server)
 	beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
-	player = await voice_client.create_ytdl_player(url, before_options=beforeArgs)
-	players[server.id] = player
-	player.start()
+	player = await voice_client.create_ytdl_player(url, before_options=beforeArgs, after=lambda: check_queue(server.id))
+	if server.id in queues:
+		queues[server.id].append(player)
+		await classicBot.say("Video queued")
+	else:
+		players[server.id] = player
+		player.start()
+
+@classicBot.command(pass_context=True)
+async def queue(ctx, url):
+	server = ctx.message.server
+	voice_client = classicBot.voice_client_in(server)
+	beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
+	player = await voice_client.create_ytdl_player(url, before_options=beforeArgs, after=lambda: check_queue(server.id))
+
+	if server.id in queues:
+		queues[server.id].append(player)
+	else:
+		queues[server.id] = [player]
+	await classicBot.say("Video queued")
+
+@classicBot.command(pass_context=True)
+async def volume(ctx, volume: int):
+	id = ctx.message.server.id
+	players[id].volume = .1*double(volume)
 
 @classicBot.command(pass_context=True)
 async def pause(ctx):
@@ -92,8 +121,14 @@ async def stop(ctx):
 	id = ctx.message.server.id
 	players[id].stop()
 	server = ctx.message.server
+	queues = {}
 	voice_client = classicBot.voice_client_in(server)
 	await voice_client.disconnect()
+
+@classicBot.command(pass_context=True)
+async def skip(ctx):
+	id = ctx.message.server.id
+	players[id].stop()
 
 @classicBot.command(pass_context=True)
 async def resume(ctx):
