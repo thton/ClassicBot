@@ -1,2 +1,4 @@
-botKey.txt
+botKey.py
 .idea
+*.pyc
+dbsettings.py

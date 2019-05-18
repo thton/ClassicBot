@@ -20,4 +20,4 @@ Install youtube_dl
 python -m pip install -U youtube_dl
 ```
 ### To run
-Create a file named botKey.txt with the bot authentication key in it as the only text.
+Create a file botKey.py with the bot authentication key in it as a variable named botKey.
