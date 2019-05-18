@@ -12,7 +12,7 @@ from botKey import botKey
 classicBot = commands.Bot(command_prefix='#')
 classicBot.remove_command("help")
 statuses = ["Version 0.0.2", "Code forever", "Azur Lane"]
-extensions = ['classicQuest', 'classicMusic']
+extensions = ['classicMusic', 'classicQuest']
 
 
 ###############################################################################
@@ -170,7 +170,7 @@ async def nuke(ctx, amount=5):
 
 
 @classicBot.command(pass_context=True)
-async def profile(user: discord.Member):
+async def test(user: discord.Member):
     level = 1
     lowexp = 0
     nextexp = 100
@@ -185,6 +185,6 @@ if __name__ == '__main__':
         try:
             classicBot.load_extension(extension)
         except Exception as e:
-            print('Error loading extensions')
+            print('Error loading extensions %s' % e)
     classicBot.loop.create_task(change_status())
     classicBot.run(botKey)
