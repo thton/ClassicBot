@@ -28,7 +28,7 @@ async def change_status():
 
 
 # prints in console when bot is running and ready
-@classicBot.event
+@classicBot.event   # TODO possibly remove, since no longer needed because of override in classicQuest
 async def on_ready():
     print("ClassicBot is running")
     print("Name: " + classicBot.user.name)
@@ -65,7 +65,7 @@ async def help(ctx):
     await classicBot.send_message(author, embed=helpmessage)
 
 
-@classicBot.event
+@classicBot.event   # TODO possibly remove, since no longer needed because of override in classicQuest
 async def on_message(message):
     channel = message.channel
     if (message.content.lower().find('fuck toan') >= 0) and (message.author.name != 'ClassicBot'):
